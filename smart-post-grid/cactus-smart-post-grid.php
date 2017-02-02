@@ -1,6 +1,6 @@
 <?php
    /*
-   Plugin Name: Smart Post Grid
+   Plugin Name: Smart Posts Grid
    Plugin URI: http://www.cactusthemes.com
    Description: Smart Post Grid is the best plugin to showcase your posts
    Version: 1.0
@@ -31,6 +31,12 @@ class cactusSmartPostGrid{
 
 		add_filter( 'mce_external_plugins', array( $this, 'regplugins'));
 		add_filter( 'mce_buttons_3', array( $this, 'regbtns') );
+        
+        add_action('init', array($this, 'init'));
+    }
+    
+    function init(){
+        load_plugin_textdomain( 'spg', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
     }
 	
 	/*
@@ -42,15 +48,12 @@ class cactusSmartPostGrid{
 		$id 					= isset($atts['id']) ? $atts['id'] : '';
 		$title        			= isset($atts['title']) ? $atts['title'] : '';  
 		$title_link 			= isset($atts['title_link']) && $atts['title_link'] != '' ?  $atts['title_link'] : '#';
-		$heading_color 			= isset($atts['heading_color']) ? $atts['heading_color'] : '';
 		$heading_icon  			= isset($atts['heading_icon']) ? $atts['heading_icon'] : '';
-		$heading_icon_color		= isset($atts['heading_icon_color']) ? $atts['heading_icon_color'] : '';
-		$heading_bg 			= isset($atts['heading_bg']) ? $atts['heading_bg'] : '';	
 		$layout 				= isset($atts['layout']) ? $atts['layout'] : '1';
 		$heading_style			= isset($atts['heading_style']) ? $atts['heading_style'] : '1'; //1-gradient, 2-bar
 		$filter_style			= isset($atts['filter_style']) ? $atts['filter_style'] : '1'; //1-link, 2-tab, 3-carousel
 		$cats 					= isset($atts['cats']) ? $atts['cats'] : '';
-		$view_all_text 			= isset($atts['view_all_text']) && $atts['view_all_text'] != '' ? $atts['view_all_text'] : esc_html('VIEW ALL','urbannews');	
+		$view_all_text 			= isset($atts['view_all_text']) && $atts['view_all_text'] != '' ? $atts['view_all_text'] : esc_html('VIEW ALL',"spg");	
 			
 		$atts['ajax_url']		= home_url( 'wp-admin/admin-ajax.php' );
 		$cat_arr = array_filter(explode(",", $cats));
@@ -62,7 +65,7 @@ class cactusSmartPostGrid{
 		}
 		
 		global $_cactus_scb_count;
-		$_cactus_scb_count = $_cactus_scb_count?$_cactus_scb_count:0;
+		$_cactus_scb_count = $_cactus_scb_count ? $_cactus_scb_count : 0;
 		$_cactus_scb_count++;
 		
 		ob_start();
@@ -81,12 +84,12 @@ class cactusSmartPostGrid{
 	                     
 	                <?php }elseif($filter_style == 2){ ?>
 	                    <div class="scb-filter-2-btns">
-	                        <a href="#scb-<?php echo esc_attr($_cactus_scb_count); ?>-all" data-toggle="tab" class="btn btn-grey btn-sm focus"><?php esc_html_e('ALL','urbannews'); ?></a>
+	                        <a href="#scb-<?php echo esc_attr($_cactus_scb_count); ?>-all" data-toggle="tab" class="btn btn-grey btn-sm focus"><?php esc_html_e('ALL',"spg"); ?></a>
 	                        <?php if(is_array($cat_arr) && count($cat_arr)){
 								foreach($cat_arr as $cat_id){
 									$atts_ajax = $atts;
 									$atts_ajax['cats'] = $cat_id;
-									if($atts['post_type']=='product'){
+									if($atts['post_type'] == 'product'){
 										$this_term = get_term_by((is_numeric($cat_id)?'id':'slug'),$cat_id,'product_cat');
 									}else{
 										$this_term = get_term_by((is_numeric($cat_id)?'id':'slug'),$cat_id,'category');
@@ -126,7 +129,7 @@ class cactusSmartPostGrid{
 
 	//render content
 	function spg_content_render($atts){
-		if($atts==''){
+		if($atts == ''){
 			$is_ajax = 1;
 			$atts = $_GET;
 		}
@@ -166,7 +169,7 @@ class cactusSmartPostGrid{
 				?>
 				<?php if($item_count%4==1 && $item_count>1){ echo '</div><div class="row">';} ?>
 				<div class="scb-col-item col-sm-<?php echo esc_attr($item_col); ?>">
-					<?php $this->urbannews_scb_item_render($thumb_size, $title_in_thumb=0, $title_class); ?>
+					<?php $this->_scb_item_render($thumb_size, $title_in_thumb=0, $title_class); ?>
 				</div><!--/scb-col-item-->
 			<?php
 				}//while have_posts
@@ -191,14 +194,14 @@ class cactusSmartPostGrid{
 				?>
 				<?php if($item_count%4==1 && $item_count>1){ echo '</div><div class="row">';} ?>
 				<div class="scb-col-item col-sm-<?php echo esc_attr($item_col); ?>">
-					<?php $this->urbannews_scb_item_render($thumb_size, $title_in_thumb=$item_count%4==1, $title_class, $item_class); ?>
+					<?php $this->_scb_item_render($thumb_size, $title_in_thumb=$item_count%4==1, $title_class, $item_class); ?>
 				</div><!--/scb-col-item-->
 			<?php
 				}//while have_posts
 			}//if have_posts
 			
 			
-		}elseif($layout==4){
+		}elseif($layout == 4){
 			
 			if($column == '1'){
 				$item_col_wrap = '12';
@@ -247,7 +250,7 @@ class cactusSmartPostGrid{
 				?>
 				
 				<div class="scb-col-item col-sm-<?php echo esc_attr($item_col); ?>">
-					<?php $this->urbannews_scb_item_render($thumb_size, $title_in_thumb=$item_count%4==1, $title_class, $item_class); ?>
+					<?php $this->_scb_item_render($thumb_size, $title_in_thumb=$item_count%4==1, $title_class, $item_class); ?>
 				</div><!--/scb-col-item-->
 			<?php
 				}//while have_posts
@@ -276,7 +279,7 @@ class cactusSmartPostGrid{
 					echo '</div><div class="row">';
 				}?>
 				<div class="scb-col-item col-md-<?php echo esc_attr($item_col); ?>">
-					<?php $this->urbannews_scb_item_render($thumb_size, $title_in_thumb=0, $title_class, $item_class); ?>
+					<?php $this->_scb_item_render($thumb_size, $title_in_thumb=0, $title_class, $item_class); ?>
 				</div><!--/scb-col-item-->
 			<?php
 				}//while have_posts
@@ -303,7 +306,7 @@ class cactusSmartPostGrid{
 				?>
 				<?php if($item_count%$divide_number==1 && $item_count>1){ echo '</div><div class="row">';} ?>
 				<div class="scb-col-item col-md-<?php echo esc_attr($item_col); ?>">
-					<?php $this->urbannews_scb_item_render($thumb_size, $title_in_thumb=0, $title_class); ?>
+					<?php $this->_scb_item_render($thumb_size, $title_in_thumb=0, $title_class); ?>
 				</div><!--/scb-col-item-->
 			<?php
 				}//while have_posts
@@ -321,7 +324,7 @@ class cactusSmartPostGrid{
 				?>
 				<?php if($item_count%8==1 && $item_count>1){ echo '</div><div class="row">';} ?>
 				<div class="scb-col-item <?php echo esc_attr($item_col); ?>">
-					<?php $this->urbannews_scb_item_render($thumb_size, $title_in_thumb=0, $title_class); ?>
+					<?php $this->_scb_item_render($thumb_size, $title_in_thumb=0, $title_class); ?>
 				</div><!--/scb-col-item-->
 			<?php
 				}//while have_posts
@@ -345,7 +348,7 @@ class cactusSmartPostGrid{
 				?>
 				<?php if($item_count%6==1 && $item_count>1 && $filter_style==3){ echo '</div><div class="row">';} ?>
 				<div class="scb-col-item col-md-<?php echo esc_attr($item_col); ?>">
-					<?php $this->urbannews_scb_item_render($thumb_size, $title_in_thumb=0, $title_class, $item_class='scb-masonry-item'); ?>
+					<?php $this->_scb_item_render($thumb_size, $title_in_thumb=0, $title_class, $item_class='scb-masonry-item'); ?>
 				</div><!--/scb-col-item-->
 			<?php
 				}//while have_posts
@@ -384,7 +387,7 @@ class cactusSmartPostGrid{
 				?>
 				<?php if($item_count%3==1 && $item_count>1){ echo '</div><div class="row">';} ?>
 				<div class="scb-col-item col-sm-<?php echo esc_attr($item_col); ?>">
-					<?php $this->urbannews_scb_item_render($thumb_size, $title_in_thumb=$item_count%3==1, $title_class); ?>
+					<?php $this->_scb_item_render($thumb_size, $title_in_thumb=$item_count%3==1, $title_class); ?>
 				</div><!--/scb-col-item-->
 			<?php
 				}//while have_posts
@@ -394,7 +397,7 @@ class cactusSmartPostGrid{
 		}//if style
 		
 		echo '</div><!--.row-->';
-		if($filter_style==3){//carousel
+		if($filter_style == 3){//carousel
 			echo '</div>';
 		}
 		wp_reset_postdata();
@@ -402,7 +405,7 @@ class cactusSmartPostGrid{
 	
 	
 	//render item
-	function urbannews_scb_item_render($thumb_size='medium', $title_in_thumb=0, $title_class='', $item_class=''){
+	function _scb_item_render($thumb_size='medium', $title_in_thumb=0, $title_class='', $item_class=''){
 		$spg_options = $this->spg_get_all_option();
 		
 		add_filter( 'excerpt_length', array( $this, 'spg_excerpt_length') );
@@ -465,13 +468,11 @@ class cactusSmartPostGrid{
 				</div><!-- .excerpt -->
 				<?php if($item_class=='scb-masonry-item'){ ?>
 					<?php $category = get_the_category();?>
-					<ul class="list-inline blog-share social-share text-center social-share-<?php echo esc_attr($category[0]->term_id);?>-hover">
-						<?php $this->spg_print_social_share(0) ?>
-					</ul>
+					
 					<a class="item-readmore-line item-readmore-line-<?php echo esc_attr($category[0]->term_id);?>-hover" href="<?php the_permalink(); ?>" title="<?php the_title_attribute(); ?>"><i>+</i></a>
 					
 				<?php }elseif(@$spg_options['spg_hide_readmore']!=1){ ?>
-					<a class="item-readmore font-nav" href="<?php the_permalink(); ?>" title="<?php the_title_attribute(); ?>"><i class="fa fa-plus-circle"></i> <span><?php esc_html_e('READ MORE','urbannews'); ?></span></a>
+					<a class="item-readmore font-nav" href="<?php the_permalink(); ?>" title="<?php the_title_attribute(); ?>"><i class="fa fa-plus-circle"></i> <span><?php esc_html_e('READ MORE',"spg"); ?></span></a>
 				<?php }//if masonry ?>
 			</div>
 			<div class="clearfix"></div>
@@ -483,7 +484,7 @@ class cactusSmartPostGrid{
 	
 	function spg_excerpt_length( $length ) {
 		$spg_options = $this->spg_get_all_option();
-		$length = @$spg_options['spg_excerpt']?$spg_options['spg_excerpt']:18;
+		$length = @$spg_options['spg_excerpt'] ? $spg_options['spg_excerpt'] : 18;
 		return $length;
 	}
 	
@@ -491,171 +492,170 @@ class cactusSmartPostGrid{
 	function spg_visual_composer(){
 		if(function_exists('vc_map')){
 		vc_map(array(
-				"name"		=> esc_html__("Smart Post Grid", "urbannews"),
+				"name"		=> esc_html__("Smart Posts Grid", "spg"),
 				"base"		=> "s_post_grid",
 				"class"		=> "wpb_vc_posts_slider_widget",
-				//"icon" => URBANNEWS_SHORTCODE_PLUGIN_URL . "/shortcodes/img/ct_scb.png",
 				"params" => 	array(
 					array(
 					"type" => "textfield",
-					"heading" => esc_html__("Title", "urbannews"),
+					"heading" => esc_html__("Title", "spg"),
 					"param_name" => "title",
 					"value" => "",
-					"description" => esc_html__('', "urbannews")
+					"description" => ''
 				),
 				array(
 					"type" => "textfield",
-					"heading" => esc_html__("Title Link", "urbannews"),
+					"heading" => esc_html__("Title Link", "spg"),
 					"param_name" => "title_link",
 					"value" => "",
-					"description" => esc_html__('', "urbannews")
+					"description" => ''
 				),
 				array(
 					"type" => "dropdown",
 					"admin_label" => true,
-					"heading" => esc_html__("Layout", "urbannews"),
+					"heading" => esc_html__("Layout", "spg"),
 					"param_name" => "layout",
 					"value" => array(
-						esc_html__("Layout 1","urbannews")=>'1',
-						esc_html__("Layout 2","urbannews")=>'2',
-						esc_html__("Layout 3","urbannews")=>'3',
-						esc_html__("Layout 4","urbannews")=>'4',
-						esc_html__("Layout 5","urbannews")=>'5',
-						esc_html__("Layout 6","urbannews")=>'6',
-						esc_html__("Layout 7","urbannews")=>'7',
-						esc_html__("Layout 8","urbannews")=>'8',
-						esc_html__("Layout 9","urbannews")=>'9',
+						esc_html__("Layout 1","spg")=>'1',
+						esc_html__("Layout 2","spg")=>'2',
+						esc_html__("Layout 3","spg")=>'3',
+						esc_html__("Layout 4","spg")=>'4',
+						esc_html__("Layout 5","spg")=>'5',
+						esc_html__("Layout 6","spg")=>'6',
+						esc_html__("Layout 7","spg")=>'7',
+						esc_html__("Layout 8","spg")=>'8',
+						esc_html__("Layout 9","spg")=>'9',
 					),
-					"description" => esc_html__("Choose box layout.", "urbannews")
+					"description" => esc_html__("Choose box layout.", "spg")
 				),
 				array(
 					"type" => "dropdown",
-					"heading" => esc_html__("Column", "urbannews"),
+					"heading" => esc_html__("Column", "spg"),
 					"param_name" => "column",
 					"std" => "3",
 					"value" => array(
-						esc_html__("1 column","urbannews")=>'1',
-						esc_html__("2 columns","urbannews")=>'2',
-						esc_html__("3 columns","urbannews")=>'3',
+						esc_html__("1 column","spg")=>'1',
+						esc_html__("2 columns","spg")=>'2',
+						esc_html__("3 columns","spg")=>'3',
 					),
 					"dependency" => array(
 							"element" => "layout",
 							"value" => array( '4', '5', '6', '7', '9' ),
 					 ),
-					"description" => esc_html__("Choose Column for layout  4,5,6,7,9", "urbannews")
+					"description" => esc_html__("Choose Column for layout  4,5,6,7,9", "spg")
 				),
 				array(
 					"type" => "textfield",
 					"admin_label" => true,
-					"heading" => esc_html__("Count", "urbannews"),
+					"heading" => esc_html__("Count", "spg"),
 					"param_name" => "count",
 					"value" => "",
-					"description" => esc_html__('Number of items to show', "urbannews")
+					"description" => esc_html__('Number of items to show', "spg")
 				),
 				array(
 					"type" => "textfield",
 					"admin_label" => true,
-					"heading" => esc_html__("Post Type", "urbannews"),
+					"heading" => esc_html__("Post Type", "spg"),
 					"param_name" => "post_type",
 					"value" => "",
-					"description" => esc_html__('Post type slug to query', "urbannews")
+					"description" => esc_html__('Post type slug to query', "spg")
 				),	
 				array(
 					"type" => "dropdown",
 					"admin_label" => true,
-					"heading" => esc_html__("Condition", "urbannews"),
+					"heading" => esc_html__("Condition", "spg"),
 					"param_name" => "condition",
 					"value" => array(
-						esc_html__("Latest","urbannews")=>'latest',
-						esc_html__("Most viewed*","urbannews")=>'view',
-						esc_html__("Most Liked*","urbannews")=>'like',
-						esc_html__("Most commented","urbannews")=>'comment',
-						esc_html__("Title","urbannews")=>'title',
-						esc_html__("IDs (only available when using IDs parameter)","urbannews")=>'input',
-						esc_html__("Random","urbannews")=>'random',
+						esc_html__("Latest","spg")=>'latest',
+						esc_html__("Most viewed*","spg")=>'view',
+						esc_html__("Most Liked*","spg")=>'like',
+						esc_html__("Most commented","spg")=>'comment',
+						esc_html__("Title","spg")=>'title',
+						esc_html__("IDs (only available when using IDs parameter)","spg")=>'input',
+						esc_html__("Random","spg")=>'random',
 	
 					),
-					"description" => esc_html__("Condition to query items (*need WTI Like post & Top 10 plugin)", "urbannews")
+					"description" => esc_html__("Condition to query items (*need WTI Like post & Top 10 plugin)", "spg")
 				),
 				array(
 					"type" => "dropdown",
 					"admin_label" => true,
-					"heading" => esc_html__("Order by", "urbannews"),
+					"heading" => esc_html__("Order by", "spg"),
 					"param_name" => "order",
 					"value" => array( 
-						esc_html__("Descending", "urbannews") => "DESC", 
-						esc_html__("Ascending", "urbannews") => "ASC" ),
-					"description" => esc_html__('Designates the ascending or descending order', 'urbannews')
+						esc_html__("Descending", "spg") => "DESC", 
+						esc_html__("Ascending", "spg") => "ASC" ),
+					"description" => esc_html__('Designates the ascending or descending order', "spg")
 				),
 				array(
 				  "type" => "textfield",
-				  "heading" => esc_html__("Categories", "urbannews"),
+				  "heading" => esc_html__("Categories", "spg"),
 				  "param_name" => "cats",
-				  "description" => esc_html__("list of categories (ID) to query items from, separated by a comma.", "urbannews")
+				  "description" => esc_html__("list of categories (ID) to query items from, separated by a comma.", "spg")
 				),
 				array(
 					"type" => "textfield",
-					"heading" => esc_html__("Tags", "urbannews"),
+					"heading" => esc_html__("Tags", "spg"),
 					"param_name" => "tags",
 					"value" => "",
-					"description" => esc_html__('list of tags to query items from, separated by a comma. For example: tag-1, tag-2, tag-3', "urbannews")
+					"description" => esc_html__('list of tags to query items from, separated by a comma. For example: tag-1, tag-2, tag-3', "spg")
 				),
 				array(
 					"type" => "textfield",
-					"heading" => esc_html__("IDs", "urbannews"),
+					"heading" => esc_html__("IDs", "spg"),
 					"param_name" => "ids",
 					"value" => "",
-					"description" => esc_html__('list of post IDs to query, separated by a comma. If this value is not empty, cats, tags and featured are omitted', "urbannews")
+					"description" => esc_html__('list of post IDs to query, separated by a comma. If this value is not empty, cats, tags and featured are omitted', "spg")
 				),
 				array(
 					"type" => "dropdown",
 					"admin_label" => true,
-					"heading" => esc_html__("Filter/arrange Style", "urbannews"),
+					"heading" => esc_html__("Filter/arrange Style", "spg"),
 					"param_name" => "filter_style",
 					"value" => array( 
-						esc_html__("No", "urbannews") => "1",
-						esc_html__("Categories Filter", "urbannews") => "2",
-						esc_html__("Carousel", "urbannews") => "3" ), 
-					"description" => esc_html__('Choose filter/arrange style', 'urbannews')
+						esc_html__("No", "spg") => "1",
+						esc_html__("Categories Filter", "spg") => "2",
+						esc_html__("Carousel", "spg") => "3" ), 
+					"description" => esc_html__('Choose filter/arrange style', "spg")
 				),
 				array(
 					"type" => "dropdown",
 					"admin_label" => true,
-					"heading" => esc_html__("Heading Style", "urbannews"),
+					"heading" => esc_html__("Heading Style", "spg"),
 					"param_name" => "heading_style",
 					"value" => array( 
-					esc_html__("Gradient", "urbannews") => "1", 
-					esc_html__("Bar", "urbannews") => "2" ),
-					"description" => esc_html__('', 'urbannews')
+					esc_html__("Gradient", "spg") => "1", 
+					esc_html__("Bar", "spg") => "2" ),
+					"description" => ''
 				),
 				array(
 				  "type" => "textfield",
-				  "heading" => esc_html__("Heading Icon", "urbannews"),
+				  "heading" => esc_html__("Heading Icon", "spg"),
 				  "param_name" => "heading_icon",
-				  "description" => esc_html__("Name of Font icon.", "urbannews"),
+				  "description" => esc_html__("Name of Font icon.", "spg"),
 				),
 				array(
 					"type" => "dropdown",
-					"heading" => esc_html__("Show category tag", "urbannews"),
+					"heading" => esc_html__("Show category tag", "spg"),
 					"param_name" => "show_category_tag",
 					"value" => array( 
-						esc_html__("Yes", "urbannews") => "1", 
-						esc_html__("No", "urbannews") => "0" ),
+						esc_html__("Yes", "spg") => "1", 
+						esc_html__("No", "spg") => "0" ),
 				),
 				array(
 					"type" => "dropdown",
-					"heading" => esc_html__("Show Meta", "urbannews"),
+					"heading" => esc_html__("Show Meta", "spg"),
 					"param_name" => "show_meta",
 					"value" => array( 
-						esc_html__("Yes", "urbannews") => "1", 
-						esc_html__("No", "urbannews") => "0" ),
-					"description" => esc_html__('', 'urbannews')
+						esc_html__("Yes", "spg") => "1", 
+						esc_html__("No", "spg") => "0" ),
+					"description" => ''
 				),
 				array(
 				  "type" => "textfield",
-				  "heading" => esc_html__("Change View All text", "urbannews"),
+				  "heading" => esc_html__("Change View All text", "spg"),
 				  "param_name" => "view_all_text",
-				  "description" => esc_html__("Set custom title for view all button, leave blank to get default or leave a space to hide it.", "urbannews"),
+				  "description" => esc_html__("Set custom title for view all button, leave blank to get default or leave a space to hide it.", "spg"),
 				),
 				
 				)
@@ -689,7 +689,7 @@ class cactusSmartPostGrid{
 		wp_enqueue_script( 'slick', SPG_PATH.'js/slick/slick.min.js', array( 'jquery' ),'1.6',true );
 		wp_register_script( 'isotope', SPG_PATH.'js/isotope.pkgd.min.js', array( 'jquery' ),'3.0',true );
 		
-		if($spg_options['spg_bootstrap']==0){
+		if(isset($spg_options['spg_bootstrap']) && $spg_options['spg_bootstrap']==0){
 			wp_enqueue_style('bootstrap-core', SPG_PATH.'css/bootstrap-core.css');
 		}
 		wp_enqueue_style( 'slick-style', SPG_PATH.'js/slick/slick.css');
@@ -1159,7 +1159,7 @@ class cactusSmartPostGrid{
 					$cat_name 	= $category->name;
 					$cat_url 	= get_category_link( $category->term_id );
 				}
-				$output .= '<a class="'.esc_attr($show_class).' cat-label-attr-'.esc_attr($category->term_id).'" href="' . esc_url($cat_url) . '" title="' .esc_html__('View all posts in ','urbannews') . esc_attr($cat_name) . '">' . esc_html( $cat_name ) . '</a>';
+				$output .= '<a class="'.esc_attr($show_class).' cat-label-attr-'.esc_attr($category->term_id).'" href="' . esc_url($cat_url) . '" title="' .esc_html__('View all posts in ',"spg") . esc_attr($cat_name) . '">' . esc_html( $cat_name ) . '</a>';
 				if($echo)
 					echo wp_kses($output,array('a'=>array('href'=>array(),'title' => array(), 'class' => array())));
 				else
@@ -1180,84 +1180,13 @@ class cactusSmartPostGrid{
 		    <span class="item-dot">.</span>
 		    <span class="item-author">
             <?php if(!$author_link){
-				echo esc_html__('by ','urbannews').get_the_author();
+				echo esc_html__('by ',"spg").get_the_author();
 			}else{ ?>
-            	<a href="<?php echo get_author_posts_url( get_the_author_meta( 'ID' ) ); ?>" class="author-url"><?php echo esc_html__('by ','urbannews').get_the_author(); ?></a>
+            	<a href="<?php echo get_author_posts_url( get_the_author_meta( 'ID' ) ); ?>" class="author-url"><?php echo esc_html__('by ',"spg").get_the_author(); ?></a>
             <?php } ?>
             </span>
 		</div>
 		<?php }
-	}
-	
-	function spg_print_social_share($title_show = 0,$id = false){
-	if(!$id){
-		$id = get_the_ID();
-	}
-?>
-  		<?php if(ot_get_option('sharing_facebook','on')=='on'){ ?>
-	  		<li class="facebook">
-	  		 	<a <?php if($title_show==1){?> data-toggle="tooltip" data-placement="top" <?php }?> title="<?php esc_attr_e('Share on Facebook','urbannews');?>" href="#" target="_blank" rel="nofollow" onclick="window.open('https://www.facebook.com/sharer/sharer.php?u='+'<?php echo urlencode(get_permalink($id)); ?>','facebook-share-dialog','width=626,height=436');return false;">
-                	<i class="fa fa-facebook"></i>
-                    <?php if($title_show==2){?>
-                    	<span><?php esc_html_e('Share on Facebook','urbannews');?></span>
-                    <?php }elseif($title_show==3){?>
-                    	<span><?php esc_html_e('Facebook','urbannews');?></span>
-                    <?php }?>
-	  		 	</a>
-	  		</li>
-    	<?php }
-
-		if(ot_get_option('sharing_twitter','on')=='on'){ ?>
-	    	<li class="twitter">
-		    	<a <?php if($title_show==1){?> data-toggle="tooltip" data-placement="top" <?php }?> href="#" title="<?php esc_attr_e('Share on Twitter','urbannews');?>" rel="nofollow" target="_blank" onclick="window.open('http://twitter.com/share?text=<?php echo urlencode(get_the_title($id)); ?>&amp;url=<?php echo urlencode(get_permalink($id)); ?>','twitter-share-dialog','width=626,height=436');return false;">
-                	<i class="fa fa-twitter"></i>
-                    <?php if($title_show==2){?>
-                    	<span><?php esc_html_e('Share on Twitter','urbannews');?></span>
-                    <?php }elseif($title_show==3){?>
-                    	<span><?php esc_html_e('Twitter','urbannews');?></span>
-                    <?php }?>
-		    	</a>
-	    	</li>
-    	<?php }
-		
-		if(ot_get_option('sharing_google','on')=='on'){ ?>
-	    	 <li class="google-plus">
-	    	 	<a <?php if($title_show==1){?> data-toggle="tooltip" data-placement="top" <?php }?> href="#" title="<?php esc_attr_e('Share on Google Plus','urbannews');?>" rel="nofollow" target="_blank" onclick="window.open('https://plus.google.com/share?url=<?php echo urlencode(get_permalink($id)); ?>','googleplus-share-dialog','width=626,height=436');return false;">
-                	<i class="fa fa-google-plus"></i>
-                    <?php if($title_show==2){?>
-                    	<span><?php esc_html_e('Share on Google Plus','urbannews');?></span>
-                    <?php }elseif($title_show==3){?>
-                        <span><?php esc_html_e('Google Plus','urbannews');?></span>
-                    <?php }?>
-	    	 	</a>
-	    	 </li>
-    	 <?php }
-
-		 if(ot_get_option('sharing_pinterest','on')=='on'){ ?>
-	    	 <li class="pinterest">
-	    	 	<a <?php if($title_show==1){?> data-toggle="tooltip" data-placement="top" <?php }?> href="#" title="<?php esc_attr_e('Pin this','urbannews');?>" rel="nofollow" target="_blank" onclick="window.open('//pinterest.com/pin/create/button/?url=<?php echo urlencode(get_permalink($id)) ?>&amp;media=<?php echo urlencode(wp_get_attachment_url( get_post_thumbnail_id($id))); ?>&amp;description=<?php echo urlencode(get_the_title($id)) ?>','pin-share-dialog','width=626,height=436');return false;">
-                	<i class="fa fa-pinterest"></i>
-                    <?php if($title_show==2){?>
-                    	<span><?php esc_html_e('Pin this','urbannews');?></span>
-                    <?php }elseif($title_show==3){?>
-                        <span><?php esc_html_e('Pinterest','urbannews');?></span>
-                    <?php }?>
-	    	 	</a>
-	    	 </li>
-    	 <?php }
-
-		 if(ot_get_option('sharing_email','on')=='on'){ ?>
-	    	<li class="envelope">
-		    	<a <?php if($title_show==1){?> data-toggle="tooltip" data-placement="top" <?php }?> href="mailto:?subject=<?php echo urlencode(get_the_title($id)); ?>&amp;body=<?php echo urlencode(get_permalink($id)) ?>" title="<?php esc_attr_e('Email this','urbannews');?>">
-                	<i class="fa fa-envelope"></i>
-                    <?php if($title_show==2){?>
-                    	<span><?php esc_html_e('Email this','urbannews');?></span>
-                    <?php }elseif($title_show==3){?>
-                        <span><?php esc_html_e('Email','urbannews');?></span>
-                    <?php }?>
-		    	</a>
-		   	</li>
-	   	<?php }
 	}
 	
 }

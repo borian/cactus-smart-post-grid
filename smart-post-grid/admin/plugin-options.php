@@ -267,10 +267,10 @@ function spg_image_radio($option,$array){
  */
 function spg_admin_scripts() {
     wp_enqueue_script('jquery');
-	//wp_enqueue_script('jscolor', spg_PATH.'js/jscolor/jscolor.js', array('jquery'));
+	//wp_enqueue_script('jscolor', SPG_PATH.'js/jscolor/jscolor.js', array('jquery'));
 	wp_enqueue_script('spg_admin', plugins_url( 'admin.js', __FILE__ ), array('jquery'));
 	wp_enqueue_style('spg_admin', plugins_url( 'admin.css', __FILE__ ));
-	wp_enqueue_style('font-awesome', spg_PATH.'font-awesome/css/font-awesome.min.css');
+	wp_enqueue_style('font-awesome', SPG_PATH.'font-awesome/css/font-awesome.min.css');
 }
 add_action( 'admin_enqueue_scripts', 'spg_admin_scripts' );
 /*
