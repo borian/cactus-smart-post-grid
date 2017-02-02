@@ -468,9 +468,7 @@ class cactusSmartPostGrid{
 				</div><!-- .excerpt -->
 				<?php if($item_class=='scb-masonry-item'){ ?>
 					<?php $category = get_the_category();?>
-					<ul class="list-inline blog-share social-share text-center social-share-<?php echo esc_attr($category[0]->term_id);?>-hover">
-						<?php $this->spg_print_social_share(0) ?>
-					</ul>
+					
 					<a class="item-readmore-line item-readmore-line-<?php echo esc_attr($category[0]->term_id);?>-hover" href="<?php the_permalink(); ?>" title="<?php the_title_attribute(); ?>"><i>+</i></a>
 					
 				<?php }elseif(@$spg_options['spg_hide_readmore']!=1){ ?>
@@ -691,7 +689,7 @@ class cactusSmartPostGrid{
 		wp_enqueue_script( 'slick', SPG_PATH.'js/slick/slick.min.js', array( 'jquery' ),'1.6',true );
 		wp_register_script( 'isotope', SPG_PATH.'js/isotope.pkgd.min.js', array( 'jquery' ),'3.0',true );
 		
-		if($spg_options['spg_bootstrap']==0){
+		if(isset($spg_options['spg_bootstrap']) && $spg_options['spg_bootstrap']==0){
 			wp_enqueue_style('bootstrap-core', SPG_PATH.'css/bootstrap-core.css');
 		}
 		wp_enqueue_style( 'slick-style', SPG_PATH.'js/slick/slick.css');
@@ -1189,77 +1187,6 @@ class cactusSmartPostGrid{
             </span>
 		</div>
 		<?php }
-	}
-	
-	function spg_print_social_share($title_show = 0,$id = false){
-	if(!$id){
-		$id = get_the_ID();
-	}
-?>
-  		<?php if(ot_get_option('sharing_facebook','on')=='on'){ ?>
-	  		<li class="facebook">
-	  		 	<a <?php if($title_show==1){?> data-toggle="tooltip" data-placement="top" <?php }?> title="<?php esc_attr_e('Share on Facebook',"spg");?>" href="#" target="_blank" rel="nofollow" onclick="window.open('https://www.facebook.com/sharer/sharer.php?u='+'<?php echo urlencode(get_permalink($id)); ?>','facebook-share-dialog','width=626,height=436');return false;">
-                	<i class="fa fa-facebook"></i>
-                    <?php if($title_show==2){?>
-                    	<span><?php esc_html_e('Share on Facebook',"spg");?></span>
-                    <?php }elseif($title_show==3){?>
-                    	<span><?php esc_html_e('Facebook',"spg");?></span>
-                    <?php }?>
-	  		 	</a>
-	  		</li>
-    	<?php }
-
-		if(ot_get_option('sharing_twitter','on')=='on'){ ?>
-	    	<li class="twitter">
-		    	<a <?php if($title_show==1){?> data-toggle="tooltip" data-placement="top" <?php }?> href="#" title="<?php esc_attr_e('Share on Twitter',"spg");?>" rel="nofollow" target="_blank" onclick="window.open('http://twitter.com/share?text=<?php echo urlencode(get_the_title($id)); ?>&amp;url=<?php echo urlencode(get_permalink($id)); ?>','twitter-share-dialog','width=626,height=436');return false;">
-                	<i class="fa fa-twitter"></i>
-                    <?php if($title_show==2){?>
-                    	<span><?php esc_html_e('Share on Twitter',"spg");?></span>
-                    <?php }elseif($title_show==3){?>
-                    	<span><?php esc_html_e('Twitter',"spg");?></span>
-                    <?php }?>
-		    	</a>
-	    	</li>
-    	<?php }
-		
-		if(ot_get_option('sharing_google','on')=='on'){ ?>
-	    	 <li class="google-plus">
-	    	 	<a <?php if($title_show==1){?> data-toggle="tooltip" data-placement="top" <?php }?> href="#" title="<?php esc_attr_e('Share on Google Plus',"spg");?>" rel="nofollow" target="_blank" onclick="window.open('https://plus.google.com/share?url=<?php echo urlencode(get_permalink($id)); ?>','googleplus-share-dialog','width=626,height=436');return false;">
-                	<i class="fa fa-google-plus"></i>
-                    <?php if($title_show==2){?>
-                    	<span><?php esc_html_e('Share on Google Plus',"spg");?></span>
-                    <?php }elseif($title_show==3){?>
-                        <span><?php esc_html_e('Google Plus',"spg");?></span>
-                    <?php }?>
-	    	 	</a>
-	    	 </li>
-    	 <?php }
-
-		 if(ot_get_option('sharing_pinterest','on')=='on'){ ?>
-	    	 <li class="pinterest">
-	    	 	<a <?php if($title_show==1){?> data-toggle="tooltip" data-placement="top" <?php }?> href="#" title="<?php esc_attr_e('Pin this',"spg");?>" rel="nofollow" target="_blank" onclick="window.open('//pinterest.com/pin/create/button/?url=<?php echo urlencode(get_permalink($id)) ?>&amp;media=<?php echo urlencode(wp_get_attachment_url( get_post_thumbnail_id($id))); ?>&amp;description=<?php echo urlencode(get_the_title($id)) ?>','pin-share-dialog','width=626,height=436');return false;">
-                	<i class="fa fa-pinterest"></i>
-                    <?php if($title_show==2){?>
-                    	<span><?php esc_html_e('Pin this',"spg");?></span>
-                    <?php }elseif($title_show==3){?>
-                        <span><?php esc_html_e('Pinterest',"spg");?></span>
-                    <?php }?>
-	    	 	</a>
-	    	 </li>
-    	 <?php }
-
-		 if(ot_get_option('sharing_email','on')=='on'){ ?>
-	    	<li class="envelope">
-		    	<a <?php if($title_show==1){?> data-toggle="tooltip" data-placement="top" <?php }?> href="mailto:?subject=<?php echo urlencode(get_the_title($id)); ?>&amp;body=<?php echo urlencode(get_permalink($id)) ?>" title="<?php esc_attr_e('Email this',"spg");?>">
-                	<i class="fa fa-envelope"></i>
-                    <?php if($title_show==2){?>
-                    	<span><?php esc_html_e('Email this',"spg");?></span>
-                    <?php }elseif($title_show==3){?>
-                        <span><?php esc_html_e('Email',"spg");?></span>
-                    <?php }?>
-		    	</a>
-		   	</li>
-	   	<?php }
 	}
 	
 }
