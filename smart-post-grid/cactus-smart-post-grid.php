@@ -3,7 +3,7 @@
    Plugin Name: Smart Posts Grid
    Plugin URI: http://www.cactusthemes.com
    Description: Smart Post Grid is the best plugin to showcase your posts
-   Version: 1.0
+   Version: 1.0.1
    Author: CactusThemes
    Author URI: http://www.cactusthemes.com
    License: GPL
