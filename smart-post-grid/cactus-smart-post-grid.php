@@ -821,6 +821,12 @@ class cactusSmartPostGrid
                 'tag' => $tags,
                 'ignore_sticky_posts' => 1
             );
+        } elseif ($pinned != '') {
+            include 'PostPinning.php';
+
+            $PP = new PostPinning();
+            $args = $PP->getQueryArgs($number, $sort_by, $categories, $tags, $pinned);
+
         } elseif ($ids != '') {
             $ids = explode(",", $ids);
             $gc = array();
