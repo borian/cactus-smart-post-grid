@@ -51,7 +51,7 @@ class cactusSmartPostGrid
 
         $id = isset($atts['id']) ? $atts['id'] : '';
         $title = isset($atts['title']) ? $atts['title'] : '';
-        $title_link = isset($atts['title_link']) && $atts['title_link'] != '' ? $atts['title_link'] : '#';
+        $title_link = isset($atts['title_link']) ? $atts['title_link'] : '';
         $heading_icon = isset($atts['heading_icon']) ? $atts['heading_icon'] : '';
         $layout = isset($atts['layout']) ? $atts['layout'] : '1';
         $heading_style = isset($atts['heading_style']) ? $atts['heading_style'] : '1'; //1-gradient, 2-bar
@@ -85,7 +85,7 @@ class cactusSmartPostGrid
                             <?php echo $heading_icon != '' ? '<i class="main-color-1 fa ' . esc_attr($heading_icon) . '"></i>' : ''; ?>
                             <?php echo esc_html($title); ?></a>
                     <?php } ?>
-                    <?php if ($filter_style == 1 && $title_link && $view_all_text != ' ') { ?>
+                    <?php if ($filter_style == 1 && $title_link != '' && $view_all_text != ' ') { ?>
                         <a href="<?php echo esc_url($title_link); ?>" class="scb-filter-1-btn font-nav"><span
                                     class="font-nav-inner"><?php echo $view_all_text != ' ' ? esc_html($view_all_text) : ''; ?></span>
                             <i class="fa fa-angle-right"></i></a>
